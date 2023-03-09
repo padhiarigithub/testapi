@@ -6,23 +6,37 @@ INSTANCE_TYPE="t2.micro"
 SECURITY_GROUP_ID="sg-017f5ac79caac7c6b" # replace with desired security group ID
 SUBNET_ID="subnet-0bb79b484d5a54899" # replace with desired subnet ID
 KEY_NAME="freqtrade" # replace with desired key pair name
+REGION="ap-southeast-1"
+SCRIPT_URL="https://raw.githubusercontent.com/padhiarigithub/testapi/main/run.sh"
 
 # Create instance
-INSTANCE_ID=$(aws ec2 run-instances --image-id $AMI_ID --instance-type $INSTANCE_TYPE --security-group-ids $SECURITY_GROUP_ID --subnet-id $SUBNET_ID --key-name $KEY_NAME --output text --query 'Instances[*].InstanceId')
+INSTANCE_ID=$(aws ec2 run-instances \
+  --image-id $AMI_ID \
+  --instance-type $INSTANCE_TYPE \
+  --key-name $KEY_NAME \
+  --region $REGION \
+  --query 'Instances[0].InstanceId' \
+  --output text)
 
 # Wait for instance to be running
 aws ec2 wait instance-running --instance-ids $INSTANCE_ID
 
-# Copy shell script to instance
-scp -i freqtrade.pem run.sh ec2-user@$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --output text --query 'Reservations[*].Instances[*].PublicIpAddress'):/home/ec2-user/
+# Get instance public IP address
+PUBLIC_IP=$(aws ec2 describe-instances \
+  --instance-ids $INSTANCE_ID \
+  --region $REGION \
+  --query 'Reservations[0].Instances[0].PublicIpAddress' \
+  --output text)
 
-# Run shell script on instance
-ssh -i freqtrade.pem ec2-user@$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --output text --query 'Reservations[*].Instances[*].PublicIpAddress') 'bash /home/ec2-user/run.sh'
+# Download script to instance
+ssh -i "C:\Users\pc\Downloads\freqtrade.pem" ubuntu@$PUBLIC_IP "wget -O run.sh $SCRIPT_URL"
 
-# Sleep for 5 minutes
+
+# Run script on instance
+ssh -i "C:\Users\pc\Downloads\freqtrade.pem" ubuntu@$PUBLIC_IP 'bash run.sh'
+
+
+# Terminate instance after 5 minutes
 sleep 300
-
-# Terminate instance
 aws ec2 terminate-instances --instance-ids $INSTANCE_ID
 
-echo "Instance terminated."
