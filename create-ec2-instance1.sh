@@ -14,7 +14,7 @@ INSTANCE_ID=$(aws ec2 run-instances --image-id $AMI_ID --instance-type $INSTANCE
 aws ec2 wait instance-running --instance-ids $INSTANCE_ID
 
 # Copy shell script to instance
-scp -i freqtrade.pem myscript.sh ec2-user@$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --output text --query 'Reservations[*].Instances[*].PublicIpAddress'):/home/ec2-user/
+scp -i freqtrade.pem run.sh ec2-user@$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --output text --query 'Reservations[*].Instances[*].PublicIpAddress'):/home/ec2-user/
 
 # Run shell script on instance
 ssh -i freqtrade.pem ec2-user@$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --output text --query 'Reservations[*].Instances[*].PublicIpAddress') 'bash /home/ec2-user/run.sh'
