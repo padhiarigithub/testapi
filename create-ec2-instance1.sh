@@ -36,6 +36,7 @@ ssh -i "C:\Users\pc\Downloads\freqtrade.pem" ubuntu@$PUBLIC_IP "wget -O run.sh $
 ssh -i "C:\Users\pc\Downloads\freqtrade.pem" ubuntu@$PUBLIC_IP 'bash run.sh'
 
 
+
 # Terminate instance after 5 minutes
 sleep 300
 aws ec2 terminate-instances --instance-ids $INSTANCE_ID
