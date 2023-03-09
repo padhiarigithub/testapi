@@ -14,7 +14,7 @@ INSTANCE_ID=$(aws ec2 run-instances --image-id $AMI_ID --instance-type $INSTANCE
 aws ec2 wait instance-running --instance-ids $INSTANCE_ID
 
 # Set variables
-#$INSTANCE_ID="your-instance-id"
+$INSTANCE_ID="(aws ec2 run-instances --image-id $AMI_ID --instance-type $INSTANCE_TYPE --security-group-ids $SECURITY_GROUP_ID --subnet-id $SUBNET_ID --key-name $KEY_NAME --output text --query 'Instances[*].InstanceId')"
 $PUBLIC_IP=(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query 'Reservations[0].Instances[0].PublicIpAddress' --output text)
 $LOCAL_SCRIPT_PATH="C:\Users\pc\Desktop\New folder\run.sh"
 $REMOTE_SCRIPT_PATH="/home/ununtu/myscript.sh"
