@@ -13,11 +13,18 @@ INSTANCE_ID=$(aws ec2 run-instances --image-id $AMI_ID --instance-type $INSTANCE
 # Wait for instance to be running
 aws ec2 wait instance-running --instance-ids $INSTANCE_ID
 
-# Copy shell script to instance
-scp -i freqtrade.pem run.sh ubuntu@$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --output text --query 'Reservations[*].Instances[*].PublicIpAddress'):/home/ec2-user/
+# Set variables
+#$INSTANCE_ID="your-instance-id"
+$PUBLIC_IP=(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query 'Reservations[0].Instances[0].PublicIpAddress' --output text)
+$LOCAL_SCRIPT_PATH="C:\Users\pc\Desktop\New folder\run.sh"
+$REMOTE_SCRIPT_PATH="/home/ununtu/myscript.sh"
+$PEM_FILE_PATH="C:\Users\pc\Downloads\freqtrade.pem"
 
-# Run shell script on instance
-ssh -i freqtrade.pem ubuntu@$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --output text --query 'Reservations[*].Instances[*].PublicIpAddress') 'bash /home/ec2-user/run.sh'
+# Copy shell script to instance
+scp -i $PEM_FILE_PATH $LOCAL_SCRIPT_PATH ubuntu@$PUBLIC_IP:$REMOTE_SCRIPT_PATH
+
+# Run script on instance
+ssh -i $PEM_FILE_PATH ubuntu@$PUBLIC_IP "bash $REMOTE_SCRIPT_PATH"
 
 # Sleep for 5 minutes
 sleep 300
