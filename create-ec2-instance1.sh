@@ -7,7 +7,7 @@ export AWS_DEFAULT_REGION=ap-southeast-1
 KEY_NAME=freqtrade
 
 # Set the security group id
-SECURITY_GROUP_NAME=launch-wizard-1
+SECURITY_GROUP_NAME=launch-wizard-2
 
 # Set the AMI ID
 AMI_ID=ami-082b1f4237bd816a1
@@ -38,7 +38,7 @@ PUBLIC_IP=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query 'Rese
 echo "Public IP address of the instance: $PUBLIC_IP"
 
 # Copy the script file to the instance
-scp -i c:/Users/pc/.ssh/$KEY_NAME.pem $SCRIPT_FILE_PATH ubuntu@$PUBLIC_IP:~
+scp -i C:\Users\pc.ssh/$KEY_NAME.pem $SCRIPT_FILE_PATH ubuntu@$PUBLIC_IP:~
 
 # Run the script on the instance
-ssh -i c:/Users/pc/.ssh/$KEY_NAME.pem ubuntu@$PUBLIC_IP 'bash ~/run.sh'
+ssh -i C:\Users\pc.ssh/$KEY_NAME.pem ubuntu@$PUBLIC_IP 'bash ~/run.sh'
