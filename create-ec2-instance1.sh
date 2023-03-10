@@ -7,7 +7,7 @@ export AWS_DEFAULT_REGION=ap-southeast-1
 KEY_NAME=freqtrade
 
 # Set the security group id
-SECURITY_GROUP_NAME=launch-wizard-1
+SECURITY_GROUP_NAME=launch-wizard-2
 
 # Set the AMI ID
 AMI_ID=ami-082b1f4237bd816a1
