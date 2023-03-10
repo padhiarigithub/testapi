@@ -38,7 +38,7 @@ PUBLIC_IP=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query 'Rese
 echo "Public IP address of the instance: $PUBLIC_IP"
 
 # Copy the script file to the instance
-scp -i C:\Users\pc.ssh/$KEY_NAME.pem $SCRIPT_FILE_PATH ubuntu@$PUBLIC_IP:~
+scp -i C:\Users\pc.ssh\$KEY_NAME.pem $SCRIPT_FILE_PATH ubuntu@$PUBLIC_IP:~
 
 # Run the script on the instance
-ssh -i C:\Users\pc.ssh/$KEY_NAME.pem ubuntu@$PUBLIC_IP 'bash ~/run.sh'
+ssh -i C:\Users\pc.ssh\$KEY_NAME.pem ubuntu@$PUBLIC_IP 'bash ~/run.sh'
