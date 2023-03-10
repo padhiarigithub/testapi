@@ -16,7 +16,7 @@ AMI_ID=ami-082b1f4237bd816a1
 INSTANCE_TYPE=t2.micro
 
 # Set the script file path
-SCRIPT_FILE_PATH=c:/Users/pc/Desktop/New_folder/run.sh
+SCRIPT_FILE_PATH=https://github.com/padhiarigithub/testapi/blob/main/run.sh
 
 # Create the security group
 aws ec2 create-security-group --group-name $SECURITY_GROUP_NAME --description "My security group"
@@ -38,7 +38,7 @@ PUBLIC_IP=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query 'Rese
 echo "Public IP address of the instance: $PUBLIC_IP"
 
 # Copy the script file to the instance
-scp -i C:\Users\pc.ssh\$KEY_NAME.pem $SCRIPT_FILE_PATH ubuntu@$PUBLIC_IP:~
+scp -i https://github.com/padhiarigithub/testapi/blob/main/$KEY_NAME.pem $SCRIPT_FILE_PATH ubuntu@$PUBLIC_IP:~
 
 # Run the script on the instance
-ssh -i C:\Users\pc.ssh\$KEY_NAME.pem ubuntu@$PUBLIC_IP 'bash ~/run.sh'
+ssh -i https://github.com/padhiarigithub/testapi/blob/main/$KEY_NAME.pem ubuntu@$PUBLIC_IP 'bash ~/run.sh'
