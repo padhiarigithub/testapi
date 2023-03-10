@@ -7,7 +7,7 @@ export AWS_DEFAULT_REGION=ap-southeast-1
 KEY_NAME=freqtrade
 
 # Set the security group id
-SECURITY_GROUP_ID=sg-017f5ac79caac7c6b
+SECURITY_GROUP_NAME=launch-wizard-1
 
 # Set the AMI ID
 AMI_ID=ami-082b1f4237bd816a1
@@ -19,10 +19,10 @@ INSTANCE_TYPE=t2.micro
 SCRIPT_FILE_PATH=/c/Users/pc/Desktop/New_folder/run.sh
 
 # Create the security group
-aws ec2 create-security-group --group-name $SECURITY_GROUP_ID --description "My security group"
+aws ec2 create-security-group --group-name $SECURITY_GROUP_NAME --description "My security group"
 
 # Open port 22 for SSH
-aws ec2 authorize-security-group-ingress --group-name $SECURITY_GROUP_ID --protocol tcp --port 22 --cidr 0.0.0.0/0
+aws ec2 authorize-security-group-ingress --group-name $SECURITY_GROUP_NAME --protocol tcp --port 22 --cidr 0.0.0.0/0
 
 # Launch the instance
 INSTANCE_ID=$(aws ec2 run-instances --image-id $AMI_ID --count 1 --instance-type $INSTANCE_TYPE --key-name $KEY_NAME --security-groups $SECURITY_GROUP_NAME --query 'Instances[0].InstanceId' --output text)
