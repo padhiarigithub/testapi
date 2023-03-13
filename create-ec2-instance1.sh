@@ -29,11 +29,11 @@ PUBLIC_IP=$(aws ec2 describe-instances \
   --output text)
 
 # Download script to instance
-scp -i  "C:\Users\YourUsername\Downloads\freqtrade.pem" "C:\Users\YourUsername\Downloads\run.sh" ubuntu@$PUBLIC_IP wget -O run.sh $SCRIPT_URL
+scp -i  "C:\Users\pc\Downloads\freqtrade.pem" "C:\Users\pc\Downloads\run.sh" ubuntu@$PUBLIC_IP:/home/ec2-user/
 
 
 # Run script on instance
-ssh -i  "C:\Users\YourUsername\Downloads\freqtrade.pem" ubuntu@$PUBLIC_IP 'bash run.sh'
+ssh -i  "C:\Users\pc\Downloads\freqtrade.pem" ubuntu@$PUBLIC_IP 'bash /home/ec2-user/run.sh'
 
 
 
