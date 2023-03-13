@@ -1,43 +1,27 @@
 #!/bin/bash
 
-# Set variables for EC2 instance configuration
-AMI_ID="ami-082b1f4237bd816a1" # replace with desired AMI ID
+# Set variables
+KEY_NAME="my-keypair"
+AMI_ID="ami-082b1f4237bd816a1"
 INSTANCE_TYPE="t2.micro"
-SECURITY_GROUP_ID="sg-017f5ac79caac7c6b" # replace with desired security group ID
-SUBNET_ID="subnet-0bb79b484d5a54899" # replace with desired subnet ID
-KEY_NAME="my_keypair" # replace with desired key pair name
-REGION="ap-southeast-1"
-SCRIPT_URL="https://raw.githubusercontent.com/padhiarigithub/testapi/main/run.sh"
+SECURITY_GROUP_ID="sg-017f5ac79caac7c6b"
+SCRIPT_URL="https://github.com/padhiarigithub/testapi/blob/main/run.sh"
 
-# Create instance
-INSTANCE_ID=$(aws ec2 run-instances \
-  --image-id $AMI_ID \
-  --instance-type $INSTANCE_TYPE \
-  --key-name $KEY_NAME \
-  --region $REGION \
-  --query 'Instances[0].InstanceId' \
-  --output text)
+# Create key pair
+aws ec2 create-key-pair --key-name $KEY_NAME --query 'KeyMaterial' --output text > $KEY_NAME.pem
+chmod 777 $KEY_NAME.pem
+
+# Launch instance
+INSTANCE_ID=$(aws ec2 run-instances --image-id $AMI_ID --instance-type $INSTANCE_TYPE --key-name $KEY_NAME --security-group-ids $SECURITY_GROUP_ID --query 'Instances[0].InstanceId' --output text)
 
 # Wait for instance to be running
 aws ec2 wait instance-running --instance-ids $INSTANCE_ID
 
-# Get instance public IP address
-PUBLIC_IP=$(aws ec2 describe-instances \
-  --instance-ids $INSTANCE_ID \
-  --region $REGION \
-  --query 'Reservations[0].Instances[0].PublicIpAddress' \
-  --output text)
+# Get public IP address of instance
+PUBLIC_IP=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --output text --query 'Reservations[*].Instances[*].PublicIpAddress')
 
-# Download script to instance
-scp -i  "C:\Users\pc\Downloads\my_keypair.pem" "C:\Users\pc\Downloads\run.sh" ubuntu@$PUBLIC_IP:/home/ec2-user/
-
+# Copy shell script to instance
+scp -i $KEY_NAME.pem https://github.com/padhiarigithub/testapi/blob/main/run.sh ubuntu@$PUBLIC_IP:/home/ec2-user/
 
 # Run script on instance
-ssh -i  "C:\Users\pc\Downloads\my_keypair.pem" ubuntu@$PUBLIC_IP 'bash /home/ec2-user/run.sh'
-
-
-
-# Terminate instance after 5 minutes
-sleep 300
-aws ec2 terminate-instances --instance-ids $INSTANCE_ID
-
+ssh -i $KEY_NAME.pem ubuntu@$PUBLIC_IP 'bash /home/ec2-user/run.sh'
