@@ -23,5 +23,5 @@ PUBLIC_IP=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --output text
 # Copy shell script to instance
 scp -i $KEY_NAME.pem https://github.com/padhiarigithub/testapi/blob/main/run.sh ubuntu@$PUBLIC_IP:/home/ec2-user/
 
-# Run script on instance
+# Run script on instance 
 ssh -i $KEY_NAME.pem ubuntu@$PUBLIC_IP 'bash /home/ec2-user/run.sh'
