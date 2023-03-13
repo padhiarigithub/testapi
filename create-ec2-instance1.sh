@@ -1,15 +1,15 @@
 #!/bin/bash
 
 # Set variables
-KEY_NAME="my-keypair"
+KEY_NAME="my_keypair"
 AMI_ID="ami-082b1f4237bd816a1"
 INSTANCE_TYPE="t2.micro"
 SECURITY_GROUP_ID="sg-017f5ac79caac7c6b"
 SCRIPT_URL="https://github.com/padhiarigithub/testapi/blob/main/run.sh"
 
-# Create key pair
-aws ec2 create-key-pair --key-name $KEY_NAME --query 'KeyMaterial' --output text > $KEY_NAME.pem
-chmod 777 $KEY_NAME.pem
+# # Create key pair
+# aws ec2 create-key-pair --key-name $KEY_NAME --query 'KeyMaterial' --output text > $KEY_NAME.pem
+# chmod 777 $KEY_NAME.pem
 
 # Launch instance
 INSTANCE_ID=$(aws ec2 run-instances --image-id $AMI_ID --instance-type $INSTANCE_TYPE --key-name $KEY_NAME --security-group-ids $SECURITY_GROUP_ID --query 'Instances[0].InstanceId' --output text)
