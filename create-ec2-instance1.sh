@@ -9,7 +9,7 @@ SCRIPT_URL="https://github.com/padhiarigithub/testapi/blob/main/run.sh"
 
 # Create key pair
 aws ec2 create-key-pair --key-name $KEY_NAME --query 'KeyMaterial' --output text > $KEY_NAME.pem
-chmod 400 $KEY_NAME.pem
+chmod 777 $KEY_NAME.pem
 
 # Launch instance
 INSTANCE_ID=$(aws ec2 run-instances --image-id $AMI_ID --instance-type $INSTANCE_TYPE --key-name $KEY_NAME --security-group-ids $SECURITY_GROUP_ID --query 'Instances[0].InstanceId' --output text)
