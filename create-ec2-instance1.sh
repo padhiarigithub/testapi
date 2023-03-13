@@ -29,15 +29,15 @@ PUBLIC_IP=$(aws ec2 describe-instances \
   --output text)
 
 # Download script to instance
-ssh -i  "https://github.com/padhiarigithub/testapi/blob/main/freqtrade.pem" ubuntu@$PUBLIC_IP wget -O run.sh $SCRIPT_URL
+scp -i  "C:\Users\YourUsername\Downloads\freqtrade.pem" "C:\Users\YourUsername\Downloads\run.sh" ubuntu@$PUBLIC_IP wget -O run.sh $SCRIPT_URL
 
 
 # Run script on instance
-ssh -i  "https://github.com/padhiarigithub/testapi/blob/main/freqtrade.pem" ubuntu@$PUBLIC_IP 'bash run.sh'
+ssh -i  "C:\Users\YourUsername\Downloads\freqtrade.pem" ubuntu@$PUBLIC_IP 'bash run.sh'
 
 
 
-# Terminate instance after 5 minutes
-sleep 300
+# Terminate instance after 2 minutes
+sleep 120
 aws ec2 terminate-instances --instance-ids $INSTANCE_ID
 
