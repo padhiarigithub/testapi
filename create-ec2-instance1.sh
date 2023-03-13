@@ -5,7 +5,7 @@ AMI_ID="ami-082b1f4237bd816a1" # replace with desired AMI ID
 INSTANCE_TYPE="t2.micro"
 SECURITY_GROUP_ID="sg-017f5ac79caac7c6b" # replace with desired security group ID
 SUBNET_ID="subnet-0bb79b484d5a54899" # replace with desired subnet ID
-KEY_NAME="freqtrade" # replace with desired key pair name
+KEY_NAME="my_keypair" # replace with desired key pair name
 REGION="ap-southeast-1"
 SCRIPT_URL="https://raw.githubusercontent.com/padhiarigithub/testapi/main/run.sh"
 
