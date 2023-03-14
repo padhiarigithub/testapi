@@ -1,27 +1,45 @@
 #!/bin/bash
 
-# Set variables
-KEY_NAME="my_keypair"
-AMI_ID="ami-082b1f4237bd816a1"
-INSTANCE_TYPE="t2.micro"
-SECURITY_GROUP_ID="sg-017f5ac79caac7c6b"
-SCRIPT_URL="https://github.com/padhiarigithub/testapi/blob/main/run.sh"
+# Set your AWS region
+export AWS_DEFAULT_REGION=ap-southeast-1
 
-# # Create key pair
-# aws ec2 create-key-pair --key-name $KEY_NAME --query 'KeyMaterial' --output text > $KEY_NAME.pem
-# chmod 777 $KEY_NAME.pem
+# Set your key pair name
+KEY_NAME=my_keypair
 
-# Launch instance
-INSTANCE_ID=$(aws ec2 run-instances --image-id $AMI_ID --instance-type $INSTANCE_TYPE --key-name $KEY_NAME --security-group-ids $SECURITY_GROUP_ID --query 'Instances[0].InstanceId' --output text)
+# Set the security group name
+SECURITY_GROUP_NAME=launch-wizard-2
 
-# Wait for instance to be running
+# Set the AMI ID
+AMI_ID=ami-082b1f4237bd816a1
+
+# Set the instance type
+INSTANCE_TYPE=t2.micro
+
+# Set the script file path
+SCRIPT_FILE_PATH=https://raw.githubusercontent.com/padhiarigithub/testapi/main/run.sh
+
+# Create the security group
+aws ec2 create-security-group --group-name $SECURITY_GROUP_NAME --description "My security group"
+
+# Open port 22 for SSH
+aws ec2 authorize-security-group-ingress --group-name $SECURITY_GROUP_NAME --protocol tcp --port 22 --cidr 0.0.0.0/0
+
+# Launch the instance
+INSTANCE_ID=$(aws ec2 run-instances --image-id $AMI_ID --count 1 --instance-type $INSTANCE_TYPE --key-name $KEY_NAME --security-groups $SECURITY_GROUP_NAME --query 'Instances[0].InstanceId' --output text)
+
+echo "Instance created with ID: $INSTANCE_ID"
+
+# Wait for the instance to start running
 aws ec2 wait instance-running --instance-ids $INSTANCE_ID
 
-# Get public IP address of instance
-PUBLIC_IP=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --output text --query 'Reservations[*].Instances[*].PublicIpAddress')
+# Get the public IP address of the instance
+PUBLIC_IP=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query 'Reservations[0].Instances[0].PublicIpAddress' --output text)
 
-# Copy shell script to instance
-scp -i $KEY_NAME.pem https://github.com/padhiarigithub/testapi/blob/main/run.sh ubuntu@$PUBLIC_IP:/home/ec2-user/
+echo "Public IP address of the instance: $PUBLIC_IP"
 
-# Run script on instance
-ssh -v -i $KEY_NAME.pem ubuntu@$PUBLIC_IP 'bash /home/ec2-user/run.sh'
+# Copy the script file to the instance
+scp -i ~/.ssh/$KEY_NAME.pem $SCRIPT_FILE_PATH ec2-user@$PUBLIC_IP:~
+
+# Run the script on the instance
+ssh -i ~/.ssh/$KEY_NAME.pem ec2-user@$PUBLIC_IP 'bash ~/script.sh'
+
