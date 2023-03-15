@@ -1,0 +1,54 @@
+name: 'Books Dev Terraform'
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Test/Prod'
+        required: true
+
+    
+    
+  
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
+
+jobs:
+  TerraformPlanAndApply:
+    # name: 'Terraform Plan'
+    # environment: Dev
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Git clone the repository
+        uses: actions/checkout@v3
+
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: arn:aws:iam:::role/cd-dev-iam-role-deploy
+          aws-region: eu-west-2
+
+      # - name: Show assumed role
+      #   run:  aws sts get-caller-identity
+         
+      - name: Terraform Init
+        run: terraform init
+        
+
+      
+    #  - name: Terraform Format
+    #    run: terraform fmt -check
+    #    working-directory: Applications/Books/Dev
+
+      
+      - name: Terraform Plan
+        # working-directory: Applications/Books/Dev
+        run: terraform plan -input=false
+      
+      - name: Terraform Apply
+        run: terraform apply -auto-approve -input=false 
+        # working-directory: Applications/Books/Dev
