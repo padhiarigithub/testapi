@@ -1,7 +1,12 @@
 name: Create and terminate EC2 instance
-'on':
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Test/Prod'
+        required: true
   push:
-    branches:
+    branches: 
       - main
 jobs:
   create-and-terminate-instance:
