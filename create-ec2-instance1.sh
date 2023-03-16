@@ -1,27 +1,44 @@
 #!/bin/bash
 
-# Set variables
-KEY_NAME="my_keypair"
+# AWS Region to use
+AWS_REGION="ap-southeast-1"
+
+# AMI ID for Amazon Linux 2
 AMI_ID="ami-082b1f4237bd816a1"
+
+# Instance type
 INSTANCE_TYPE="t2.micro"
-SECURITY_GROUP_ID="sg-017f5ac79caac7c6b"
-SCRIPT_URL="https://github.com/padhiarigithub/testapi/blob/main/run.sh"
 
-# Create key pair
-aws ec2 create-key-pair --key-name $KEY_NAME --query 'KeyMaterial' --output text > $KEY_NAME.pem
-chmod 400 $KEY_NAME.pem
+# Key pair name
+KEY_NAME="freqtrade"
 
-# Launch instance
-INSTANCE_ID=$(aws ec2 run-instances --image-id $AMI_ID --instance-type $INSTANCE_TYPE --key-name $KEY_NAME --security-group-ids $SECURITY_GROUP_ID --query 'Instances[0].InstanceId' --output text)
+# Security group name
+SECURITY_GROUP_NAME="my-security-group"
 
-# Wait for instance to be running
-aws ec2 wait instance-running --instance-ids $INSTANCE_ID
+# User data script to install Node.js and Git
+USER_DATA="#!/bin/bash
+yum update -y
+yum install -y gcc-c++ make
+curl -sL https://rpm.nodesource.com/setup_14.x | sudo bash -
+yum install -y nodejs
+yum install -y git"
 
-# Get public IP address of instance
-PUBLIC_IP=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --output text --query 'Reservations[*].Instances[*].PublicIpAddress')
+# Create security group
+aws ec2 create-security-group --group-name "${SECURITY_GROUP_NAME}" --description "My security group"
+aws ec2 authorize-security-group-ingress --group-name "${SECURITY_GROUP_NAME}" --protocol tcp --port 22 --cidr 0.0.0.0/0
 
-# Copy shell script to instance
-scp -i $KEY_NAME.pem https://github.com/padhiarigithub/testapi/blob/main/run.sh ubuntu@$PUBLIC_IP:/home/ec2-user/
+# Launch EC2 instance with user data script
+INSTANCE_ID=$(aws ec2 run-instances --image-id "${AMI_ID}" --instance-type "${INSTANCE_TYPE}" --key-name "${KEY_NAME}" --security-groups "${SECURITY_GROUP_NAME}" --user-data "${USER_DATA}" --query 'Instances[0].InstanceId' --output text)
 
-# Run script on instance
-ssh -v -i $KEY_NAME.pem ubuntu@$PUBLIC_IP 'bash /home/ec2-user/run.sh'
+# Wait for instance to start
+aws ec2 wait instance-status-ok --instance-ids "${INSTANCE_ID}"
+
+# Print instance IP address
+INSTANCE_IP=$(aws ec2 describe-instances --instance-ids "${INSTANCE_ID}" --query 'Reservations[0].Instances[0].PublicIpAddress' --output text)
+echo "Instance IP address: ${INSTANCE_IP}"
+
+# Wait for SSH to be available
+while ! nc -w 1 "${INSTANCE_IP}" 22 >/dev/null 2>&1; do sleep 1; done
+
+# SSH into instance and check Node.js and Git versions
+ssh -o StrictHostKeyChecking=no -i "${KEY_NAME}.pem" ec2-user@"${INSTANCE_IP}" 'node --version && git --version'
